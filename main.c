@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// estrutura dos produtos do estoque
+// estrutura do produto
 struct Produto {
     int id;
     char nome[50];
@@ -10,18 +10,17 @@ struct Produto {
     int quantidade;
 };
 
-
-
+// funcoes
 void cadastrarProduto();
 void listarProdutos();
 void excluirProduto();
-void salvarProdutoEmArquivo(FILE *hortifruti, struct Produto produto);
+void salvarProduto(FILE *hortifruti, struct Produto produto);
 
 int main() {
     int opcao;
 
     do {
-        printf("\n--- Sistema de Gerenciamento de Produtos HORTIFRUTI LB ---\n");
+        printf("\n--- Sistema de Gerenciamento de Produtos HORTIFRUTI OPAV ---\n");
         printf("1. Cadastrar Produto \n");
         printf("2. Listar Produtos \n");
         printf("3. Excluir Produto \n");
@@ -51,18 +50,19 @@ int main() {
     return 0;
 }
 
-// cadastrar produto
+// chama a funcao para cadastro do produto
 void cadastrarProduto() {
     struct Produto produto;
     FILE *hortifruti;
 
+    // abre o arquivo para adicionar o produto ao final do arquivo ("a"
     hortifruti = fopen("produtos.txt", "a");
     if (hortifruti == NULL) {
         printf("Erro ao abrir o arquivo para escrita.\n");
         return;
     }
 
-    printf("\n--- Cadastrar Produto no Estoque ---\n");
+    printf("\n--- Cadastrar Produto no Estoque - OPAV ---\n");
     printf("Digite o ID do produto: ");
     scanf("%d", &produto.id);
     printf("Nome do produto: ");
@@ -73,47 +73,40 @@ void cadastrarProduto() {
     printf("Quantidade em estoque: ");
     scanf("%d", &produto.quantidade);
 
-    salvarProdutoEmArquivo(hortifruti, produto);
-    printf("Produto cadastrado com sucesso no HORTIFRUTI LB!\n");
+    salvarProduto(hortifruti, produto);
+    printf("Produto cadastrado com sucesso no HORTIFRUTI OPAV!\n");
 
-    // fechar arquivo depois de salvo
     fclose(hortifruti);
 }
 
-// salvar produto no arquivo
-void salvarProdutoEmArquivo(FILE *hortifruti, struct Produto produto) {
+void salvarProduto(FILE *hortifruti, struct Produto produto) {
     fprintf(hortifruti, "%d %s %.2f %d\n", produto.id, produto.nome, produto.preco, produto.quantidade);
 }
 
-// listar produtos
 void listarProdutos() {
     struct Produto produto;
     FILE *hortifruti;
 
-    //arquivo em modo leitura 'r'
     hortifruti = fopen("produtos.txt", "r");
     if (hortifruti == NULL) {
         printf("Erro ao abrir o arquivo para leitura.\n");
         return;
     }
 
-    printf("\n--- Lista de Produtos do HORTIFRUTI LB ---\n");
+    printf("\n--- Lista de Produtos do HORTIFRUTI OPAV ---\n");
     while (fscanf(hortifruti, "%d %49s %f %d", &produto.id, produto.nome, &produto.preco, &produto.quantidade) != EOF) {
         printf("ID: %d | Nome: %s | Preco: R$%.2f | Quantidade: %d\n",
                produto.id, produto.nome, produto.preco, produto.quantidade);
     }
 
-    // fechar arquivo depois da leitura
     fclose(hortifruti);
 }
 
-// excluir produto conforme o ID
 void excluirProduto() {
     struct Produto produto;
     int id, encontrado = 0;
     FILE *hortifruti, *hortifrutiTemp;
 
-    // abre arquivo em modo de leitura 'r'
     hortifruti = fopen("produtos.txt", "r");
     if (hortifruti == NULL) {
         printf("Erro ao abrir o arquivo original.\n");
@@ -127,11 +120,10 @@ void excluirProduto() {
         return;
     }
 
-    printf("\n--- Excluir Produto do Estoque ---\n");
+    printf("\n--- Excluir Produto do Estoque - OPAV ---\n");
     printf("Digite o ID do produto que deseja excluir do estoque: ");
     scanf("%d", &id);
 
-    // le o arquivo original e copia para o temporário, menos o produto excluido
     while (fscanf(hortifruti, "%d %49s %f %d", &produto.id, produto.nome, &produto.preco, &produto.quantidade) != EOF) {
         if (produto.id == id) {
             printf("Produto com o ID %d (%s) excluído com sucesso.\n", produto.id, produto.nome);
@@ -141,12 +133,10 @@ void excluirProduto() {
         }
     }
 
-    // fecha os arquivos
     fclose(hortifruti);
     fclose(hortifrutiTemp);
 
     if (encontrado) {
-        // remove o arquivo original e renomeia o temporario
         remove("produtos.txt");
         rename("temp.txt", "produtos.txt");
     } else {
